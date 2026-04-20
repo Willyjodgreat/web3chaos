@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intent Engine — Turn Real Demand Into Users</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #060410;
+  --bg2:     #0c0820;
+  --bg3:     #100d28;
+  --v:       #8b5cf6;
+  --v2:      #a78bfa;
+  --v3:      #c4b5fd;
+  --amber:   #f59e0b;
+  --green:   #34d399;
+  --white:   #f5f0ff;
+  --muted:   rgba(245,240,255,0.5);
+  --border:  rgba(139,92,246,0.2);
+  --border2: rgba(139,92,246,0.1);
+  --glow:    rgba(139,92,246,0.35);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--white);font-family:'Rajdhani',sans-serif;overflow-x:hidden;cursor:none;}
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(139,92,246,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,246,0.04) 1px,transparent 1px);background-size:56px 56px;pointer-events:none;z-index:0;}
+
+/* CURSOR */
+.cur{width:8px;height:8px;background:var(--v);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;box-shadow:0 0 14px var(--v),0 0 28px var(--v2);}
+.cur-ring{width:32px;height:32px;border:1px solid var(--v2);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;opacity:.7;transition:all .14s ease;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:18px 56px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);background:rgba(6,4,16,.94);backdrop-filter:blur(20px);}
+.logo{font-family:'Orbitron',sans-serif;font-weight:900;font-size:17px;letter-spacing:4px;color:var(--v2);text-shadow:0 0 24px var(--v);text-decoration:none;}
+.logo span{color:var(--white);}
+.nav-links{display:flex;gap:36px;align-items:center;}
+.nav-links a{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s;}
+.nav-links a:hover{color:var(--v2);}
+.nav-cta{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--v2);border:1px solid var(--v);padding:8px 22px;text-decoration:none;transition:all .2s;cursor:none;}
+.nav-cta:hover{background:var(--v);color:var(--white);box-shadow:0 0 24px var(--glow);}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:130px 56px 80px;position:relative;overflow:hidden;z-index:1;}
+.hero-ring{position:absolute;width:720px;height:720px;border-radius:50%;border:1px solid rgba(139,92,246,.12);top:50%;right:-80px;transform:translateY(-50%);animation:rp 5s ease-in-out infinite;}
+.hero-ring::before{content:'';position:absolute;inset:60px;border-radius:50%;border:1px solid rgba(139,92,246,.08);}
+.hero-ring::after{content:'';position:absolute;inset:140px;border-radius:50%;border:1px solid rgba(167,139,250,.18);box-shadow:0 0 60px rgba(139,92,246,.1),inset 0 0 40px rgba(139,92,246,.06);animation:rp 5s ease-in-out infinite reverse;}
+@keyframes rp{0%,100%{opacity:.5;transform:translateY(-50%) scale(1);}50%{opacity:1;transform:translateY(-50%) scale(1.02);}}
+
+.badge{display:inline-flex;align-items:center;gap:8px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3);padding:6px 14px;margin-bottom:32px;opacity:0;animation:fu .8s ease .1s forwards;}
+.badge-dot{width:6px;height:6px;background:var(--green);border-radius:50%;box-shadow:0 0 8px var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.badge-text{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--green);}
+
+.hero-title{font-family:'Orbitron',sans-serif;font-weight:900;font-size:clamp(36px,6.5vw,90px);line-height:.95;margin-bottom:32px;opacity:0;animation:fu .8s ease .3s forwards;}
+.hero-title .line1,.hero-title .line2{color:var(--white);display:block;margin-bottom:8px;}
+.hero-title .line3{color:var(--v2);text-shadow:0 0 40px var(--v),0 0 80px rgba(139,92,246,.4);display:block;}
+
+.hero-sub{max-width:560px;font-size:18px;line-height:1.85;color:var(--muted);margin-bottom:44px;font-weight:300;opacity:0;animation:fu .8s ease .5s forwards;}
+.hero-sub strong{color:var(--white);font-weight:600;}
+
+.hero-btns{display:flex;gap:16px;align-items:center;flex-wrap:wrap;opacity:0;animation:fu .8s ease .7s forwards;}
+.btn-glow{background:transparent;border:1px solid var(--v);color:var(--v2);padding:15px 40px;font-family:'Orbitron',sans-serif;font-weight:700;font-size:11px;letter-spacing:3px;text-transform:uppercase;text-decoration:none;cursor:none;position:relative;overflow:hidden;transition:all .3s;box-shadow:0 0 20px rgba(139,92,246,.15);}
+.btn-glow::before{content:'';position:absolute;inset:0;background:var(--v);transform:translateX(-101%);transition:transform .3s;z-index:-1;}
+.btn-glow:hover{color:var(--white);box-shadow:0 0 40px var(--glow);}
+.btn-glow:hover::before{transform:translateX(0);}
+.btn-amber{background:var(--amber);color:#000;padding:15px 40px;font-family:'Orbitron',sans-serif;font-weight:700;font-size:11px;letter-spacing:3px;text-transform:uppercase;text-decoration:none;cursor:none;border:none;transition:all .3s;box-shadow:0 0 24px rgba(245,158,11,.4);}
+.btn-amber:hover{box-shadow:0 0 40px rgba(245,158,11,.7);transform:translateY(-2px);}
+.btn-ghost{font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:2px;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:8px;transition:color .2s,gap .2s;}
+.btn-ghost:hover{color:var(--white);gap:14px;}
+
+@keyframes fu{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
+
+/* TICKER */
+.ticker{overflow:hidden;background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:12px 0;position:relative;z-index:1;}
+.t-track{display:inline-flex;animation:tick 30s linear infinite;white-space:nowrap;}
+.t-item{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--v2);padding:0 32px;opacity:.8;}
+.t-item::after{content:'—';margin-left:20px;opacity:.3;}
+@keyframes tick{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* SECTIONS */
+section{padding:110px 56px;position:relative;z-index:1;}
+.s-tag{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--v2);margin-bottom:18px;display:flex;align-items:center;gap:10px;}
+.s-tag::before{content:'//';opacity:.5;}
+.s-title{font-family:'Orbitron',sans-serif;font-weight:900;font-size:clamp(30px,5vw,68px);line-height:.95;letter-spacing:-1px;margin-bottom:18px;}
+.accent{color:var(--v2);text-shadow:0 0 30px var(--v);}
+.amber-t{color:var(--amber);text-shadow:0 0 20px rgba(245,158,11,.4);}
+.green-t{color:var(--green);}
+
+/* PROBLEM */
+.problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;margin-top:72px;}
+.prob-item{padding:24px 0;border-bottom:1px solid var(--border2);display:flex;gap:18px;align-items:flex-start;}
+.prob-item:first-child{border-top:1px solid var(--border2);}
+.prob-arrow{font-family:'Share Tech Mono',monospace;color:var(--v2);font-size:14px;margin-top:2px;flex-shrink:0;}
+.prob-text{font-size:16px;line-height:1.7;color:var(--muted);}
+.prob-text strong{color:var(--white);}
+.problem-right{padding:44px;border:1px solid var(--border);background:var(--bg3);position:relative;overflow:hidden;}
+.problem-right::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--v2),transparent);box-shadow:0 0 16px var(--v);}
+.pr-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--v2);margin-bottom:20px;opacity:.8;}
+.pr-quote{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:600;line-height:1.5;color:var(--white);margin-bottom:6px;font-style:italic;}
+.pr-author{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--v2);margin-bottom:28px;}
+.pr-divider{height:1px;background:var(--border);margin:0 0 28px 0;}
+.pr-insight{font-size:15px;line-height:1.85;color:var(--muted);}
+.pr-insight strong{color:var(--white);}
+
+/* FLOW */
+.flow-head{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:end;margin-bottom:72px;}
+.flow-sub{font-size:16px;line-height:1.85;color:var(--muted);font-weight:300;}
+.flow-engine-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--amber);text-transform:uppercase;margin-bottom:16px;opacity:.8;}
+.flow-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative;}
+.flow-grid::before{content:'';position:absolute;top:56px;left:12.5%;right:12.5%;height:1px;background:linear-gradient(90deg,transparent,var(--v),var(--v),var(--v),transparent);opacity:.3;z-index:0;}
+.fcard{background:var(--bg2);border:1px solid var(--border2);padding:36px 28px;position:relative;overflow:hidden;transition:border-color .3s,transform .3s;z-index:1;}
+.fcard:not(:last-child){border-right:none;}
+.fcard:hover{border-color:var(--v);transform:translateY(-6px);box-shadow:0 20px 60px rgba(139,92,246,.1);}
+.fcard-num{font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:3px;color:var(--v2);opacity:.5;margin-bottom:16px;}
+.fcard-icon{margin-bottom:18px;display:block;line-height:0;}
+.fcard-name{font-family:'Orbitron',sans-serif;font-weight:700;font-size:15px;margin-bottom:12px;line-height:1.2;color:var(--white);}
+.fcard-desc{font-size:13px;line-height:1.85;color:var(--muted);margin-bottom:16px;}
+.fcard-out{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--green);border-left:2px solid var(--green);padding-left:10px;opacity:.9;}
+
+/* VERSUS */
+.versus-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:72px;}
+.v-card{padding:52px;position:relative;overflow:hidden;}
+.v-card.old{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);}
+.v-card.new{background:var(--bg3);border:1px solid var(--border);}
+.v-card.new::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--v2),transparent);}
+.v-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;margin-bottom:20px;}
+.v-label.dim{color:rgba(255,255,255,.2);}
+.v-label.lit{color:var(--v2);}
+.v-heading{font-family:'Orbitron',sans-serif;font-size:20px;font-weight:700;margin-bottom:28px;}
+.v-heading.dim{color:rgba(255,255,255,.25);}
+.v-heading.lit{color:var(--white);}
+.v-item{display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:15px;}
+.v-item:last-of-type{border-bottom:none;}
+.v-item.dim{color:rgba(255,255,255,.25);}
+.v-item.lit{color:var(--white);}
+.tick-no{color:rgba(255,255,255,.15);font-size:16px;flex-shrink:0;}
+.tick-yes{color:var(--green);font-size:16px;flex-shrink:0;}
+.hormozi-box{margin-top:36px;padding:28px;border-left:3px solid var(--v2);background:rgba(139,92,246,.05);}
+.hormozi-quote{font-family:'Rajdhani',sans-serif;font-size:17px;line-height:1.75;color:var(--white);font-style:italic;margin-bottom:12px;}
+.hormozi-context{font-size:14px;line-height:1.75;color:var(--muted);}
+.hormozi-sig{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--v2);margin-top:14px;opacity:.8;}
+
+/* WHO */
+.who-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:72px;}
+.who-card{background:var(--bg2);border:1px solid var(--border2);padding:48px;transition:border-color .3s,background .3s;}
+.who-card:hover{border-color:var(--v);background:var(--bg3);}
+.who-card.no{opacity:.5;}
+.who-check{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;}
+.who-check.yes{color:var(--green);}
+.who-check.no{color:rgba(255,255,255,.25);}
+.who-title{font-family:'Orbitron',sans-serif;font-size:18px;font-weight:700;margin-bottom:14px;}
+.who-desc{font-size:15px;line-height:1.8;color:var(--muted);}
+
+/* GET */
+.get-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:72px;}
+.get-card{background:var(--bg2);border:1px solid var(--border2);padding:40px 36px;transition:border-color .3s,transform .3s;}
+.get-card:hover{border-color:var(--v);transform:translateY(-4px);}
+.get-icon{line-height:0;margin-bottom:20px;display:block;}
+.get-title{font-family:'Orbitron',sans-serif;font-size:15px;font-weight:700;margin-bottom:12px;color:var(--white);}
+.get-desc{font-size:14px;line-height:1.8;color:var(--muted);}
+
+/* PROCESS */
+.proc-list{margin-top:64px;border-top:1px solid var(--border);}
+.proc-item{display:grid;grid-template-columns:80px 220px 1fr 1fr;gap:40px;align-items:start;padding:40px 0;border-bottom:1px solid var(--border);transition:padding-left .3s,background .3s;}
+.proc-item:hover{padding-left:12px;background:rgba(139,92,246,.03);}
+.p-num{font-family:'Orbitron',sans-serif;font-size:40px;font-weight:900;color:rgba(139,92,246,.15);line-height:1;padding-top:4px;}
+.p-step{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;color:var(--white);line-height:1.4;padding-top:4px;}
+.p-detail{font-size:14px;line-height:1.8;color:var(--muted);}
+.p-output{font-size:13px;line-height:1.75;color:var(--green);border-left:2px solid rgba(52,211,153,.3);padding-left:16px;}
+.p-output-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(52,211,153,.5);margin-bottom:6px;}
+
+/* TWITTER CTA */
+.twitter-sec{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:80px 56px;text-align:center;position:relative;overflow:hidden;z-index:1;}
+.twitter-sec::before{content:'';position:absolute;width:500px;height:300px;background:radial-gradient(ellipse,rgba(29,161,242,.06) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;}
+.tw-icon{margin-bottom:20px;display:flex;justify-content:center;}
+.tw-title{font-family:'Orbitron',sans-serif;font-size:clamp(24px,4vw,48px);font-weight:900;color:var(--white);margin-bottom:16px;}
+.tw-sub{font-size:17px;line-height:1.7;color:var(--muted);max-width:480px;margin:0 auto 36px;}
+.btn-twitter{display:inline-flex;align-items:center;gap:12px;background:#000;color:#fff;border:1px solid rgba(255,255,255,.15);padding:16px 44px;font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;text-decoration:none;cursor:none;transition:all .3s;}
+.btn-twitter:hover{border-color:var(--white);box-shadow:0 0 30px rgba(255,255,255,.1);transform:translateY(-2px);}
+
+/* CTA */
+.cta-sec{padding:140px 56px;text-align:center;position:relative;overflow:hidden;z-index:1;}
+.cta-sec::before{content:'';position:absolute;width:600px;height:400px;border-radius:50%;background:radial-gradient(ellipse,rgba(139,92,246,.08) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;}
+.cta-tag{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:5px;text-transform:uppercase;color:var(--v2);margin-bottom:24px;position:relative;}
+.cta-title{font-family:'Orbitron',sans-serif;font-size:clamp(44px,8vw,100px);font-weight:900;line-height:.95;margin-bottom:28px;position:relative;}
+.cta-sub{font-size:17px;line-height:1.8;color:var(--muted);max-width:480px;margin:0 auto 48px;position:relative;}
+.cta-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;position:relative;}
+.cta-btn{display:inline-block;background:var(--v);color:var(--white);padding:18px 56px;font-family:'Orbitron',sans-serif;font-size:12px;font-weight:900;letter-spacing:3px;text-transform:uppercase;text-decoration:none;cursor:none;box-shadow:0 0 40px rgba(139,92,246,.5),0 0 80px rgba(139,92,246,.2);transition:transform .2s,box-shadow .2s;}
+.cta-btn:hover{transform:translateY(-3px);box-shadow:0 0 60px rgba(139,92,246,.7);}
+.cta-btn-wa{display:inline-block;background:transparent;color:var(--amber);border:1px solid var(--amber);padding:18px 56px;font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;text-decoration:none;cursor:none;box-shadow:0 0 20px rgba(245,158,11,.2);transition:all .3s;}
+.cta-btn-wa:hover{background:var(--amber);color:#000;box-shadow:0 0 40px rgba(245,158,11,.5);}
+
+/* FOOTER */
+footer{padding:40px 56px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:var(--bg);position:relative;z-index:1;}
+.f-logo{font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;letter-spacing:4px;color:var(--v2);text-shadow:0 0 16px var(--v);text-decoration:none;}
+.f-logo span{color:var(--white);}
+.f-copy{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);opacity:.5;}
+
+.reveal{opacity:0;transform:translateY(36px);transition:opacity .8s ease,transform .8s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+@media(max-width:768px){
+  nav{padding:16px 24px;}
+  .nav-links{display:none;}
+  .hero,section,.twitter-sec,.cta-sec{padding:80px 24px;}
+  .problem-grid,.flow-head,.versus-grid,.who-grid,.get-grid{grid-template-columns:1fr;}
+  .flow-grid{grid-template-columns:1fr 1fr;}
+  .proc-item{grid-template-columns:60px 1fr;gap:20px;}
+  .p-detail,.p-output{display:none;}
+  footer{flex-direction:column;gap:12px;text-align:center;}
+  .cta-btns{flex-direction:column;align-items:center;}
+}
+</style>
+</head>
+<body>
+
+<div class="cur" id="cur"></div>
+<div class="cur-ring" id="cring"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">INTENT<span>ENGINE</span></a>
+  <div class="nav-links">
+    <a href="#problem">The Problem</a>
+    <a href="#system">The System</a>
+    <a href="#contact">Work Together</a>
+  </div>
+  <a href="https://wa.me/2349039143509" class="nav-cta">Book a Call</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-ring"></div>
+  <div class="badge">
+    <div class="badge-dot"></div>
+    <span class="badge-text">For SaaS Founders — Lagos, Nigeria</span>
+  </div>
+  <h1 class="hero-title">
+    <span class="line1">MOST PRODUCTS</span>
+    <span class="line2">DON'T FAIL BECAUSE</span>
+    <span class="line3">THEY'RE BAD.</span>
+  </h1>
+  <p class="hero-sub">
+    They fail because the right people never saw themselves in the message.<br><br>
+    <strong>Intent Engine</strong> maps real user frustration into precise positioning, sharp messaging, and the people who already need what you built — without guessing, without ads, without starting from zero.
+  </p>
+  <div class="hero-btns">
+    <a href="https://wa.me/2349039143509" class="btn-amber">Book a Free Call</a>
+    <a href="#system" class="btn-glow">See How It Works</a>
+    <a href="#contact" class="btn-ghost">Talk on WhatsApp →</a>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="t-track">
+    <span class="t-item">Intent Discovery</span>
+    <span class="t-item">Real Complaints</span>
+    <span class="t-item">Perception Fixing</span>
+    <span class="t-item">Content That Connects</span>
+    <span class="t-item">X Engagement</span>
+    <span class="t-item">WhatsApp Outreach</span>
+    <span class="t-item">No Ad Spend</span>
+    <span class="t-item">Actual Users</span>
+    <span class="t-item">Demand First</span>
+    <span class="t-item">Start From Signal</span>
+    <span class="t-item">Intent Discovery</span>
+    <span class="t-item">Real Complaints</span>
+    <span class="t-item">Perception Fixing</span>
+    <span class="t-item">Content That Connects</span>
+    <span class="t-item">X Engagement</span>
+    <span class="t-item">WhatsApp Outreach</span>
+    <span class="t-item">No Ad Spend</span>
+    <span class="t-item">Actual Users</span>
+    <span class="t-item">Demand First</span>
+    <span class="t-item">Start From Signal</span>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<section id="problem" style="background:var(--bg2);">
+  <div class="reveal">
+    <div class="s-tag">What's Actually Happening</div>
+    <h2 class="s-title">RIGHT NOW, MOST<br><span class="accent">FOUNDERS ARE GUESSING.</span></h2>
+  </div>
+  <div class="problem-grid">
+    <div class="problem-list">
+      <div class="prob-item reveal"><div class="prob-arrow">→</div><div class="prob-text">Posting content and <strong>hoping something sticks</strong></div></div>
+      <div class="prob-item reveal"><div class="prob-arrow">→</div><div class="prob-text">Trying every angle with <strong>no real signal guiding them</strong></div></div>
+      <div class="prob-item reveal"><div class="prob-arrow">→</div><div class="prob-text">Paying for marketers who <strong>don't understand the problem they're solving</strong></div></div>
+      <div class="prob-item reveal"><div class="prob-arrow">→</div><div class="prob-text"><strong>Impressions with no conversations.</strong> Traffic with no users at the end.</div></div>
+      <div class="prob-item reveal"><div class="prob-arrow">→</div><div class="prob-text">Months of effort. <strong>No clear pattern. No repeatable result.</strong></div></div>
+      <div class="prob-item reveal"><div class="prob-arrow">→</div><div class="prob-text">The product is good. The people just <strong>don't see themselves in the message.</strong></div></div>
+    </div>
+    <div class="problem-right reveal">
+      <div class="pr-label">// The Reason It Happens</div>
+      <div class="pr-quote">"People do not buy goods and services. They buy relations, stories, and magic."</div>
+      <div class="pr-author">— Seth Godin</div>
+      <div class="pr-divider"></div>
+      <div class="pr-insight">
+        Godin isn't talking about storytelling for storytelling's sake. He's saying that <strong>no one buys a product they don't feel.</strong> The transaction only happens after the person thinks — <em>"this was made for someone exactly like me."</em><br><br>
+        AI flooded the world with content. Writing is easy now. But <strong>relevance</strong> — that feeling of "this person actually understands my problem" — that's still rare.<br><br>
+        If your product isn't woven into their story, they scroll past it. Not because they don't need it. Because they didn't see themselves in it.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SYSTEM -->
+<section id="system">
+  <div class="flow-head reveal">
+    <div>
+      <div class="s-tag">The System</div>
+      <h2 class="s-title">FOUR LAYERS.<br><span class="accent">ONE ENGINE.</span></h2>
+    </div>
+    <div>
+      <div class="flow-engine-label">How the engine runs</div>
+      <p class="flow-sub">
+        Each layer feeds the next. Perception informs intent. Intent shapes the message. The message drives distribution. Distribution triggers conversion.<br><br>
+        Pull any one piece out and the machine stalls. Keep them connected and it compounds — bringing users without restarting from scratch every month.
+      </p>
+    </div>
+  </div>
+  <div class="flow-grid">
+    <div class="fcard reveal">
+      <div class="fcard-num">// 01</div>
+      <span class="fcard-icon"><svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="var(--v2)" stroke-width="1.5" stroke-linecap="round"><circle cx="14" cy="14" r="9"/><circle cx="14" cy="14" r="4"/><line x1="14" y1="1" x2="14" y2="6"/><line x1="14" y1="22" x2="14" y2="27"/><line x1="1" y1="14" x2="6" y2="14"/><line x1="22" y1="14" x2="27" y2="14"/></svg></span>
+      <div class="fcard-name">PERCEPTION</div>
+      <p class="fcard-desc">We fix how your product is understood — not just described. So the right people recognize it as theirs, immediately, without needing you to explain it.</p>
+      <div class="fcard-out">Clarity that needs no pitch</div>
+    </div>
+    <div class="fcard reveal">
+      <div class="fcard-num">// 02</div>
+      <span class="fcard-icon"><svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="var(--v2)" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="17" r="5"/><line x1="15" y1="13" x2="26" y2="2"/><line x1="20" y1="2" x2="26" y2="2"/><line x1="26" y1="2" x2="26" y2="8"/></svg></span>
+      <div class="fcard-name">INTENT DISCOVERY</div>
+      <p class="fcard-desc">We go into real conversations — Reddit, X, communities — and find exactly what your users are saying when they think nobody's listening. Their words, not our assumptions.</p>
+      <div class="fcard-out">Signal before strategy</div>
+    </div>
+    <div class="fcard reveal">
+      <div class="fcard-num">// 03</div>
+      <span class="fcard-icon"><svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="var(--v2)" stroke-width="1.5" stroke-linecap="round"><circle cx="14" cy="19" r="2" fill="var(--v2)"/><path d="M8 13 Q14 7 20 13"/><path d="M4 9 Q14 1 24 9"/><line x1="14" y1="21" x2="14" y2="25"/><line x1="10" y1="25" x2="18" y2="25"/></svg></span>
+      <div class="fcard-name">CONTENT + DISTRIBUTION</div>
+      <p class="fcard-desc">We turn intent signals into content that feels familiar to your audience — then put it in the spaces where they already gather. No paid reach. No shouting into the void.</p>
+      <div class="fcard-out">Right message, right place</div>
+    </div>
+    <div class="fcard reveal">
+      <div class="fcard-num">// 04</div>
+      <span class="fcard-icon"><svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="var(--v2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="9" r="4"/><path d="M2 24 Q2 18 10 18"/><polyline points="16,14 22,20 16,26"/><line x1="10" y1="20" x2="22" y2="20"/></svg></span>
+      <div class="fcard-name">CONVERSION</div>
+      <p class="fcard-desc">Attention is not the goal. We push until attention becomes a reply, a DM, a sign-up. Real traction from people who already need exactly what you built.</p>
+      <div class="fcard-out">Users, not just views</div>
+    </div>
+  </div>
+</section>
+
+<!-- VERSUS -->
+<section style="background:var(--bg2);">
+  <div class="reveal">
+    <div class="s-tag">Why This Works</div>
+    <h2 class="s-title">MOST PEOPLE DO<br><span class="accent">THIS BACKWARDS.</span></h2>
+  </div>
+  <div class="versus-grid">
+    <div class="v-card old reveal">
+      <div class="v-label dim">// The Common Approach</div>
+      <div class="v-heading dim">Create content first.<br>Hope it lands.</div>
+      <div class="v-item dim"><span class="tick-no">✕</span>Random topics driven by trends, not demand</div>
+      <div class="v-item dim"><span class="tick-no">✕</span>Generic angles that feel like every other post</div>
+      <div class="v-item dim"><span class="tick-no">✕</span>Reach that produces views but not conversations</div>
+      <div class="v-item dim"><span class="tick-no">✕</span>No repeatable pattern — just effort and hope</div>
+    </div>
+    <div class="v-card new reveal">
+      <div class="v-label lit">// The Intent Engine Approach</div>
+      <div class="v-heading lit">Start from demand.<br>Build everything around it.</div>
+      <div class="v-item lit"><span class="tick-yes">✓</span>Real complaints. Real language. Real intent signals.</div>
+      <div class="v-item lit"><span class="tick-yes">✓</span>Content that feels like it came from inside your audience's head</div>
+      <div class="v-item lit"><span class="tick-yes">✓</span>Distribution where your people already spend their attention</div>
+      <div class="v-item lit"><span class="tick-yes">✓</span>A system that compounds — not a campaign that peaks and dies</div>
+      <div class="hormozi-box">
+        <div class="hormozi-quote">The best marketing doesn't feel like marketing.</div>
+        <div class="hormozi-context">Hormozi isn't telling you to be subtle. He's saying when your content mirrors what someone is already thinking, it stops feeling like an ad and starts feeling like a discovery. That's the gap between impressions and users — and it only closes when you start from real demand, not a content calendar.</div>
+        <div class="hormozi-sig">— Alex Hormozi</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO -->
+<section>
+  <div class="reveal">
+    <div class="s-tag">Who This Is For</div>
+    <h2 class="s-title">YOU KNOW THIS<br><span class="accent">IS YOU.</span></h2>
+  </div>
+  <div class="who-grid">
+    <div class="who-card reveal">
+      <div class="who-check yes">✓ This is you</div>
+      <div class="who-title">You're building a SaaS product</div>
+      <div class="who-desc">You feel like the product is good — but the market doesn't see it that way yet. You've tried content, tried posting, tried explaining it differently. Something isn't connecting.</div>
+    </div>
+    <div class="who-card reveal">
+      <div class="who-check yes">✓ This is you</div>
+      <div class="who-title">You're under 100 users</div>
+      <div class="who-desc">You're early and you know it. You don't need vanity metrics or impressions — you need people who actually need what you built, using it, and telling you why it matters to them.</div>
+    </div>
+    <div class="who-card reveal">
+      <div class="who-check yes">✓ This is you</div>
+      <div class="who-title">You're posting but not converting</div>
+      <div class="who-desc">The content is going out. The views are coming in. But nobody's signing up. The problem isn't your volume — it's that nothing you're saying maps to what your audience is already feeling.</div>
+    </div>
+    <div class="who-card no reveal">
+      <div class="who-check no">✕ This isn't for you</div>
+      <div class="who-title">You want a one-time blast</div>
+      <div class="who-desc">If you're looking for a quick campaign with no strategy behind it, we're not the right fit. Intent Engine is a system built to compound. Results grow the longer it runs — not overnight.</div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT YOU GET -->
+<section style="background:var(--bg2);">
+  <div class="reveal">
+    <div class="s-tag">What You Get</div>
+    <h2 class="s-title">NOT DELIVERABLES.<br><span class="accent">DIRECTION.</span></h2>
+  </div>
+  <div class="get-grid">
+    <div class="get-card reveal">
+      <span class="get-icon"><svg width="30" height="30" viewBox="0 0 30 30" fill="none" stroke="var(--v2)" stroke-width="1.5" stroke-linecap="round"><path d="M2 15 Q15 3 28 15 Q15 27 2 15Z"/><circle cx="15" cy="15" r="4"/><circle cx="15" cy="15" r="1.5" fill="var(--v2)"/></svg></span>
+      <div class="get-title">Who Actually Needs You</div>
+      <div class="get-desc">Not a persona. Not a demographic. A real picture of who is struggling right now with the exact problem your product solves — and where they live online.</div>
+    </div>
+    <div class="get-card reveal">
+      <span class="get-icon"><svg width="30" height="30" viewBox="0 0 30 30" fill="none" stroke="var(--v2)" stroke-width="1.5" stroke-linecap="round"><line x1="6" y1="10" x2="24" y2="10"/><line x1="6" y1="15" x2="20" y2="15"/><line x1="6" y1="20" x2="16" y2="20"/><path d="M20 22 L26 8 L28 14 Z" stroke-linejoin="round"/></svg></span>
+      <div class="get-title">Messaging That Lands</div>
+      <div class="get-desc">Copy built from the exact words your users use when they're frustrated — so when they read it, it feels less like a pitch and more like someone finally understood.</div>
+    </div>
+    <div class="get-card reveal">
+      <span class="get-icon"><svg width="30" height="30" viewBox="0 0 30 30" fill="none" stroke="var(--v2)" stroke-width="1.5" stroke-linecap="round"><rect x="4" y="4" width="9" height="9"/><rect x="17" y="4" width="9" height="9"/><rect x="4" y="17" width="9" height="9"/><rect x="17" y="17" width="9" height="9" opacity="0.4"/></svg></span>
+      <div class="get-title">Content Angles With Purpose</div>
+      <div class="get-desc">Specific hooks, threads, and post angles pulled from intent data — not guesses about what might trend. Every piece of content has a reason to exist before it's written.</div>
+    </div>
+    <div class="get-card reveal">
+      <span class="get-icon"><svg width="30" height="30" viewBox="0 0 30 30" fill="none" stroke="var(--v2)" stroke-width="1.5" stroke-linecap="round"><circle cx="15" cy="6" r="2.5"/><circle cx="5" cy="22" r="2.5"/><circle cx="25" cy="22" r="2.5"/><line x1="15" y1="8.5" x2="6.5" y2="20"/><line x1="15" y1="8.5" x2="23.5" y2="20"/><line x1="7.5" y1="22" x2="22.5" y2="22"/></svg></span>
+      <div class="get-title">Reach Into the Right Rooms</div>
+      <div class="get-desc">X engagement, WhatsApp outreach, and placement in the specific conversations where your audience is already asking questions your product answers.</div>
+    </div>
+    <div class="get-card reveal">
+      <span class="get-icon"><svg width="30" height="30" viewBox="0 0 30 30" fill="none" stroke="var(--v2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5 H20 Q26 5 26 11 V16 Q26 22 20 22 H16 L10 27 V22 H8 Q4 22 4 16 V11 Q4 5 4 5Z"/><line x1="10" y1="12" x2="20" y2="12"/><line x1="10" y1="16" x2="16" y2="16"/></svg></span>
+      <div class="get-title">Conversations, Not Impressions</div>
+      <div class="get-desc">We push attention past the view — into DMs, replies, and sign-ups. The goal was never reach. It was always the person who replies and says "tell me more."</div>
+    </div>
+    <div class="get-card reveal">
+      <span class="get-icon"><svg width="30" height="30" viewBox="0 0 30 30" fill="none" stroke="var(--v2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15 A10 10 0 0 1 25 15"/><polyline points="22,9 25,15 19,15"/><path d="M25 15 A10 10 0 0 1 5 15"/><polyline points="8,21 5,15 11,15"/></svg></span>
+      <div class="get-title">A System That Compounds</div>
+      <div class="get-desc">Every layer connects. Intent feeds the message. The message fuels distribution. Distribution drives conversion. Each cycle tightens — so results grow without restarting from scratch.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section>
+  <div class="reveal">
+    <div class="s-tag">How We Work</div>
+    <h2 class="s-title">FIVE STEPS.<br><span class="accent">REAL OUTPUT.</span></h2>
+    <p style="max-width:520px;font-size:16px;line-height:1.85;color:var(--muted);margin-top:20px;">Each step produces something tangible. Not a meeting, not a deck — something that moves the needle and gives you visibility into exactly what we're doing and why.</p>
+  </div>
+  <div class="proc-list">
+    <div class="proc-item reveal">
+      <div class="p-num">01</div>
+      <div class="p-step">TELL US YOUR PRODUCT</div>
+      <div class="p-detail">One sentence describing what you built and who you think it's for. That's the starting point. Everything else we figure out — you don't need a brief, a deck, or a strategy doc.</div>
+      <div class="p-output"><div class="p-output-label">Output</div>We know your problem space. Research begins within 24 hours.</div>
+    </div>
+    <div class="proc-item reveal">
+      <div class="p-num">02</div>
+      <div class="p-step">WE FIND THE REAL DEMAND</div>
+      <div class="p-detail">We go into Reddit threads, X replies, and communities where your target audience complains, questions, and describes their frustration. We collect the signal — their exact language, their exact problems, what they've already tried.</div>
+      <div class="p-output"><div class="p-output-label">Output</div>A map of real intent: who hurts, how they say it, and where they're looking for answers.</div>
+    </div>
+    <div class="proc-item reveal">
+      <div class="p-num">03</div>
+      <div class="p-step">WE BUILD THE MESSAGE</div>
+      <div class="p-detail">We take the raw intent data and shape it into sharp positioning and personalized outreach — content that doesn't sound like marketing because it's grounded in the things people are already saying to each other.</div>
+      <div class="p-output"><div class="p-output-label">Output</div>Positioning copy + outreach messages written in the voice of your audience, not ours.</div>
+    </div>
+    <div class="proc-item reveal">
+      <div class="p-num">04</div>
+      <div class="p-step">YOU SEE IT BEFORE WE SEND</div>
+      <div class="p-detail">We show you the full output on a sample of contacts first. You review the angle, the tone, the targeting. You approve it. Nothing goes out until you've seen exactly what we're doing and why.</div>
+      <div class="p-output"><div class="p-output-label">Output</div>Full visibility and approval before a single message is sent. No surprises.</div>
+    </div>
+    <div class="proc-item reveal">
+      <div class="p-num">05</div>
+      <div class="p-step">CONVERSATIONS START</div>
+      <div class="p-detail">The campaign runs. Replies come in. We hand you a warm list of people who are already engaged — not cold prospects, not leads to nurture from scratch. People who responded because the message matched something real.</div>
+      <div class="p-output"><div class="p-output-label">Output</div>Active conversations with people who already need what you built — ready for you to close.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL SHIFT -->
+<section style="background:var(--bg2);">
+  <div style="max-width:820px;" class="reveal">
+    <div class="s-tag">The Real Shift</div>
+    <h2 class="s-title" style="margin-bottom:40px;">YOU DON'T HAVE A<br><span class="accent">CONTENT PROBLEM.</span></h2>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="display:flex;gap:16px;align-items:flex-start;padding:32px;border:1px solid var(--border2);background:var(--bg);" class="reveal">
+        <div style="font-family:'Orbitron',sans-serif;font-size:13px;color:var(--v2);letter-spacing:2px;flex-shrink:0;margin-top:4px;">→</div>
+        <div>
+          <div style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;margin-bottom:12px;">You have a perception problem.</div>
+          <div style="font-size:15px;line-height:1.85;color:var(--muted);">The right people are seeing you. They're reading your bio, scrolling your posts, landing on your page. But they're leaving because nothing they see tells them — clearly, immediately — that this was built for someone like them. That's not a content volume problem. That's a clarity problem.</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:16px;align-items:flex-start;padding:32px;border:1px solid var(--border2);background:var(--bg);" class="reveal">
+        <div style="font-family:'Orbitron',sans-serif;font-size:13px;color:var(--v2);letter-spacing:2px;flex-shrink:0;margin-top:4px;">→</div>
+        <div>
+          <div style="font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;margin-bottom:12px;">You have a relevance problem.</div>
+          <div style="font-size:15px;line-height:1.85;color:var(--muted);">Your content doesn't mirror what your user is feeling in the moment they see it. It's close — but not close enough to make them stop and think "that's me." Fix that gap between what you're saying and what they're experiencing, and the friction disappears. That's what we build.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TWITTER CTA -->
+<div class="twitter-sec reveal">
+  <span class="tw-icon"><svg width="36" height="36" viewBox="0 0 48 48" fill="var(--white)" xmlns="http://www.w3.org/2000/svg"><path d="M36.6 6H43.3L28.9 22.4L46 42H32.6L22.1 28.6L10.1 42H3.4L18.8 24.5L2.3 6H16.1L25.6 18.3L36.6 6ZM34.3 38H37.9L14.1 9.7H10.2L34.3 38Z"/></svg></span>
+  <h2 class="tw-title">FOLLOW THE BUILD</h2>
+  <p class="tw-sub">Daily threads on intent, positioning, and the real mechanics of turning user frustration into traction. No inspiration posts — just the actual work.</p>
+  <a href="https://x.com/web3chaos969" target="_blank" class="btn-twitter">
+    <svg width="16" height="16" viewBox="0 0 48 48" fill="currentColor"><path d="M36.6 6H43.3L28.9 22.4L46 42H32.6L22.1 28.6L10.1 42H3.4L18.8 24.5L2.3 6H16.1L25.6 18.3L36.6 6ZM34.3 38H37.9L14.1 9.7H10.2L34.3 38Z"/></svg> Follow @web3chaos969
+  </a>
+</div>
+
+<!-- CTA -->
+<section class="cta-sec" id="contact">
+  <div class="cta-tag">// Your product deserves real users</div>
+  <h2 class="cta-title">DONE WAITING<br><span class="accent">FOR IT TO CLICK.</span></h2>
+  <p class="cta-sub">You've built something real. The demand exists — the people who need it are out there, talking about this problem right now. We find them, build the message, and make the connection. Let's start.</p>
+  <div class="cta-btns">
+    <a href="https://wa.me/2349039143509" class="cta-btn">Talk to Us on WhatsApp</a>
+    <a href="https://wa.me/2349039143509" class="cta-btn-wa">Book a Free Call</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#" class="f-logo">INTENT<span>ENGINE</span></a>
+  <div class="f-copy">© 2026 — Lagos, Nigeria — Demand Before Content</div>
+  <a href="https://x.com/web3chaos969" target="_blank" style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--v2);text-decoration:none;opacity:.8;transition:opacity .2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.8">𝕏 @web3chaos969</a>
+</footer>
+
+<script>
+const cur=document.getElementById('cur'),ring=document.getElementById('cring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cur.style.left=mx-4+'px';cur.style.top=my-4+'px';
+});
+(function f(){rx+=(mx-rx-16)*.12;ry+=(my-ry-16)*.12;
+  ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(f);})();
+const io=new IntersectionObserver((entries)=>{
+  entries.forEach((e,i)=>{if(e.isIntersecting)setTimeout(()=>e.target.classList.add('visible'),i*90);});
+},{threshold:.06});
+document.querySelectorAll('.reveal').forEach(e=>io.observe(e));
+</script>
+</body>
+</html>
